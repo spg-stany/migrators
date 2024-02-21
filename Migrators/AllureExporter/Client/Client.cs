@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using AllureExporter.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -75,7 +76,7 @@ public class Client : IClient
     {
         _logger.LogInformation("Getting test case ids from main suite");
 
-        var response = await _httpClient.GetAsync($"api/rs/testcasetree/leaf?projectId={projectId}&treeId=2");
+        var response = await _httpClient.GetAsync($"api/rs/testcasetree/leaf?projectId={projectId}&treeId=2&size=500");
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError(
@@ -91,6 +92,7 @@ public class Client : IClient
         return testCases is { Content.Count: 0 }
             ? new List<int>()
             : testCases.Content
+                //.Where(t => t.Id == 15155)
                 .Where(t => _migrateAutotests || t.Automated == false)
                 .Select(t => t.Id)
                 .ToList();
@@ -101,7 +103,7 @@ public class Client : IClient
         _logger.LogInformation("Getting test case ids from suite {SuiteId}", suiteId);
 
         var response =
-            await _httpClient.GetAsync($"api/rs/testcasetree/leaf?projectId={projectId}&treeId=2&path={suiteId}");
+            await _httpClient.GetAsync($"api/rs/testcasetree/leaf?projectId={projectId}&treeId=2&path={suiteId}&size=500");
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError(
@@ -167,7 +169,7 @@ public class Client : IClient
     {
         _logger.LogInformation("Getting attachments for test case with id {TestCaseId}", testCaseId);
 
-        var response = await _httpClient.GetAsync($"api/rs/testcase/attachment?testCaseId={testCaseId}");
+        var response = await _httpClient.GetAsync($"api/rs/testcase/attachment?testCaseId={testCaseId}&size=100");
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError(

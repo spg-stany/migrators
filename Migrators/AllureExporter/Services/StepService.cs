@@ -1,6 +1,7 @@
 using System.Text;
 using AllureExporter.Client;
 using AllureExporter.Models;
+using JsonWriter;
 using Microsoft.Extensions.Logging;
 using Models;
 
@@ -10,19 +11,41 @@ public class StepService : IStepService
 {
     private readonly ILogger<StepService> _logger;
     private readonly IClient _client;
+    private readonly IWriteService _writeService;
+        private readonly IAttachmentService _attachmentService;
 
-    public StepService(ILogger<StepService> logger, IClient client)
+    public StepService(ILogger<StepService> logger, IClient client, IWriteService writeService
+        )
     {
         _logger = logger;
         _client = client;
+        _writeService = writeService;
     }
 
-    public async Task<List<Step>> ConvertSteps(int testCaseId)
+    public async Task<List<Step>> ConvertSteps(int testCaseId, Guid testCaseGuid)
     {
         var steps = await _client.GetSteps(testCaseId);
-
+        /*
         _logger.LogDebug("Found steps: {@Steps}", steps);
 
+        _logger.LogInformation("Getting attachments for step for test case with id {TestCaseId}", testCaseId);
+
+        foreach (var step in steps)
+        {
+            foreach (var stepStep in step.Steps.Where(stepStep =>
+                             stepStep.Attachments != null)) {
+                _logger.LogDebug("Found attachments: {@Attachments}", stepStep.Attachments);
+                _logger.LogInformation("Downloading attachments");
+                foreach (var attachment in stepStep.Attachments)
+                {
+                    _logger.LogDebug("Downloading attachment: {Name}", attachment.Name);
+                    var bytes = await _client.DownloadAttachment(attachment.Id);
+                    var name = await _writeService.WriteAttachment(testCaseGuid, bytes, attachment.Name);
+                }
+            }
+        }
+        */
+        
         return steps.Select(allureStep =>
             {
                 var attachments = new List<string>();

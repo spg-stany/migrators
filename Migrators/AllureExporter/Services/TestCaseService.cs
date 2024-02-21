@@ -66,7 +66,7 @@ public class TestCaseService : ITestCaseService
 
         var testCaseGuid = Guid.NewGuid();
         var tmsAttachments = await _attachmentService.DownloadAttachments(testCaseId, testCaseGuid);
-        var steps = await _stepService.ConvertSteps(testCaseId);
+        var steps = await _stepService.ConvertSteps(testCaseId, testCaseGuid);
         var caseAttributes = await ConvertAttributes(testCaseId, testCase, attributes);
 
         var allureTestCase = new TestCase

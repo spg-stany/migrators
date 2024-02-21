@@ -4,5 +4,5 @@ namespace AllureExporter.Services;
 
 public interface IStepService
 {
-    Task<List<Step>> ConvertSteps(int testCaseId);
+    Task<List<Step>> ConvertSteps(int testCaseId, Guid testCaseGuid);
 }

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Models;
@@ -9,6 +10,7 @@ public class WriteService : IWriteService
 {
     private readonly ILogger<WriteService> _logger;
     private readonly string _path;
+    private static readonly Regex _symbolsToReplaceRegex = new Regex("[\\/\\:*?\"<>|]");
 
     public WriteService(ILogger<WriteService> logger, IConfiguration configuration)
     {
@@ -31,7 +33,7 @@ public class WriteService : IWriteService
             Directory.CreateDirectory(fullPath);
         }
 
-        var filePath = GetAttachmentPath(fileName, fullPath);
+        var filePath = GetAttachmentPath(CorrectAttachmentName(fileName), fullPath);
 
         _logger.LogInformation("Writing attachment {FileName} for test case {Id}: {Path}",
             fileName, id, filePath);
@@ -40,6 +42,11 @@ public class WriteService : IWriteService
         writer.Write(content);
 
         return Path.GetFileName(filePath);
+    }
+
+    private string CorrectAttachmentName(string name)
+    {
+        return _symbolsToReplaceRegex.Replace(name, "");
     }
 
     private static string GetAttachmentPath(string fileName, string directoryPath)
